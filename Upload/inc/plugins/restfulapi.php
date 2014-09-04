@@ -38,12 +38,12 @@ function restfulapi_install() {
 	$tables = array();
 	$collation = $db->build_create_table_collation();
 	
-	if(! $db->table_exists("apisettings")) { // change isdefault to tinyint
+	if(! $db->table_exists("apisettings")) {
 		$tables["apisettings"] = "CREATE TABLE " . TABLE_PREFIX . "apisettings (
 		  id int unsigned NOT NULL auto_increment,
 		  apiaction varchar(20) NOT NULL default '',
 		  apivalue varchar(250) NOT NULL default '',
-		  isdefault int unsigned NOT NULL default 1,
+		  isdefault smallint unsigned NOT NULL default 1,
 		  PRIMARY KEY (id)
 		) ENGINE=MyISAM{$collation};";
 	}
@@ -606,59 +606,6 @@ function restfulapi_cache_delete() {
 	// delete cache trace from DB - if any!
 	$db->delete_query("datacache", "title='restfulapi'");
 }
-/*
-function restfulapi_apilist_install() {
-	global $cache;
-	$apilist = $cache->read("restfulapilist");
-	
-	if(! is_array($apilist)) {
-		$apilist = array();
-	}
-	
-	$apis = glob(RESTFULAPI_PATH . "api/*api.class.php");
-	
-	foreach($apis as $api) {
-		if(isset($apilist[$api])) {
-			continue;
-		}
-		require_once $api;
-		$api = str_replace(array(RESTFULAPI_PATH . "api/", "api.class.php"), "", $api);
-		$apiclass = $api . "api";
-		$api_instance = new $apiclass;
-		if(! $api_instance->is_installed()) {
-			$api_instance->install();
-		}
-		$apilist[$api] = $api_instance->info();
-	}
-	
-	$cache->update("restfulapilist", $apilist);
-}
-*/
-/*
-function restfulapi_apilist_uninstall() {
-	global $cache;
-	
-	$apilist = $cache->read("restfulapilist");
-	
-	if(! is_array($apilist)) {
-		// well weird but let's get out of here
-		return;
-	}
-	
-	foreach($apilist as $api => $api_info) {
-		require_once RESTFULAPI_PATH . "api/" . $api . "api.class.php";
-		$apiclass = $api . "api";
-		$api_instance = new $apiclass;
-		$api_instance->uninstall();  // no need to verify if it is_installed, we know it is
-		// no need to remove the API from here, as we will empty the cache at the end
-	}
-	
-	// delete cache trace
-	$cache->update("restfulapilist", null);
-	// propagate deletion to db
-	$db->delete_query("datacache", "title='restfulapi'");
-	
-}*/
 
 function restfulapi_apilist_activate() {
 	global $cache, $db;
